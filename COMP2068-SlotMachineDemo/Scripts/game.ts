@@ -13,13 +13,22 @@ var betOneButton: objects.Button;
 var resetButton: objects.Button;
 var tiles: createjs.Bitmap[] = [];
 var tileContainers: createjs.Container[] = [];
+var credit: createjs.Text;
+var bet: createjs.Text;
+var winnerPaid: createjs.Text;
+var lose: createjs.Text;
+var win: createjs.Text;
+var sndSpin: createjs.Sound;
+var sndBgm: createjs.Sound;
+var sndBtn: createjs.Sound;
 
 // Game Variables
 var playerMoney = 1000;
 var winnings = 0;
 var jackpot = 5000;
 var turn = 0;
-var playerBet = 0;
+var playerBet = 5;
+var maxBet = 10;
 var winNumber = 0;
 var lossNumber = 0;
 var spinResult;
@@ -54,7 +63,7 @@ function gameLoop() {
 }
 
 
-/* Utility function to reset all fruit tallies */
+/* tility function to reset all fruit tallies */
 function resetFruitTally() {
     grapes = 0;
     watermalon = 0;
@@ -65,6 +74,21 @@ function resetFruitTally() {
     seven3 = 0;
     dollor = 0;
 }
+
+/* Utility function to reset the player stats */
+function resetAll() {
+    playerMoney = 1000;
+    winnings = 0;
+    jackpot = 5000;
+    turn = 0;
+    playerBet = 5;
+    maxBet = 10;
+    winNumber = 0;
+    lossNumber = 0;
+    winRatio = 0;
+}
+
+
 
 // Event handlers
 
@@ -89,18 +113,19 @@ function spinReels() {
 
 
     for (var tile = 0; tile < 5; tile++) {
-        if (turn > 0) {
+        //if (turn > 0) {
             game.removeChild(tiles[tile]);
-        }
+        //} 
         tiles[tile] = new createjs.Bitmap("assets/images/" + spinResult[tile] + ".png");
-        tiles[tile].x = 59 + (105 * tile);
-        tiles[tile].y = 188;
+        tiles[tile].x = 110 + (190 * tile);
+        tiles[tile].y = 220;
         
         game.addChild(tiles[tile]);
         console.log(game.getNumChildren());
+
+        determineWinnings();
     }
-
-
+    
 }
 
 /* Utility function to check if a value falls within a range of bounds */
@@ -250,8 +275,48 @@ function createUI():void {
     resetButton.setScale(95/132, 95/131);
     game.addChild(resetButton.getImage());
 
+    resetButton.getImage().addEventListener("click", resetAll);
+
     resetButton.getImage().addEventListener("click", function () {
         console.log("reset clicked");
+
+    // Reset Text
+        credit = new createjs.Text("credit", "40px Arial", "#FF1100");
+        credit.text = "" + playerMoney;
+        credit.x = 200;
+        credit.y = 536;
+
+        game.addChild(credit);
+
+        bet = new createjs.Text("BET", "40px Arial", "#FF1100");
+        bet.text = "" + playerBet;
+        bet.x = 800;
+        bet.y = 536;
+
+        game.addChild(bet);
+
+        winnerPaid = new createjs.Text("winnerpaid", "40px Arial", "#FF1100");
+        winnerPaid.text = "" + winnings;
+        winnerPaid.x = 1000;
+        winnerPaid.y = 536;
+
+        game.addChild(winnerPaid);
+
+
+        win = new createjs.Text("numWin", "40px Arial", "#FF1100");
+        win.text = "Win: " + winNumber;
+        win.x = 360;
+        win.y = 20;
+
+        game.addChild(win);
+
+
+        lose = new createjs.Text("numLose", "40px Arial", "#FF1100");
+        lose.text = "Lose: " + lossNumber;
+        lose.x = 630;
+        lose.y = 20;
+
+        game.addChild(lose);
     });
 }
 
@@ -266,7 +331,6 @@ function main() {
 
     // Create Slotmachine User Interface
     createUI();
-
 
     stage.addChild(game);
 }
