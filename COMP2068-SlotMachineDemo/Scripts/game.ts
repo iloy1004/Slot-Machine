@@ -45,6 +45,7 @@ var crown = 0;
 var seven = 0;
 var seven3 = 0;
 var dollor = 0;
+var blank = 0;
 
 function init() {
     canvas = document.getElementById("canvas");
@@ -73,6 +74,7 @@ function resetFruitTally() {
     seven = 0;
     seven3 = 0;
     dollor = 0;
+    blank = 0;
 }
 
 /* Utility function to reset the player stats */
@@ -124,6 +126,42 @@ function spinReels() {
         console.log(game.getNumChildren());
 
         determineWinnings();
+        
+        // Reset Text
+        //credit = new createjs.Text("credit", "40px Arial", "#FF1100");
+        credit.text = "" + playerMoney;
+        credit.x = 200;
+        credit.y = 536;
+
+        game.addChild(credit);
+
+        //bet = new createjs.Text("BET", "40px Arial", "#FF1100");
+        bet.text = "" + playerBet;
+        bet.x = 800;
+        bet.y = 536;
+
+        game.addChild(bet);
+
+        //winnerPaid = new createjs.Text("winnerpaid", "40px Arial", "#FF1100");
+        winnerPaid.text = "" + winnings;
+        winnerPaid.x = 1000;
+        winnerPaid.y = 536;
+
+        game.addChild(winnerPaid);
+
+
+        //win = new createjs.Text("numWin", "40px Arial", "#FF1100");
+        win.text = "Win: " + winNumber;
+        win.x = 360;
+        win.y = 20;
+
+        game.addChild(win);
+
+        lose.text = "Lose: " + lossNumber;
+        lose.x = 630;
+        lose.y = 20;
+
+        game.addChild(lose);
     }
     
 }
@@ -141,8 +179,8 @@ function checkRange(value, lowerBounds, upperBounds) {
 /* When this function is called it determines the betLine results.
 e.g. Bar - Orange - Banana */
 function Reels() {
-    var betLine = [" ", " ", " ", " ", " ", " "];
-    var outCome = [0, 0, 0, 0, 0, 0];
+    var betLine = [" ", " ", " ", " ", " "];
+    var outCome = [0, 0, 0, 0, 0];
 
     for (var spin = 0; spin < 5; spin++) {
         outCome[spin] = Math.floor((Math.random() * 65) + 1);
@@ -187,7 +225,7 @@ function Reels() {
 
 /* This function calculates the player's winnings, if any */
 function determineWinnings() {
-    if (dollor == 0) {
+    if (blank == 0) {
         if (grapes == 5) {
             winnings = playerBet * 10;
         }
@@ -247,7 +285,8 @@ function determineWinnings() {
 
 }
 
-function createUI():void {
+function createUI(): void {
+
     // instantiate my background
     background = new createjs.Bitmap("/assets/images/background.png");
     game.addChild(background);

@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="assets\images\3seven.png" />
+    <Content Include="assets\images\blank.png" />
     <Content Include="assets\images\btnBetMax.png" />
     <Content Include="assets\images\btnBetOne.png" />
     <Content Include="assets\images\btnReset.png" />
