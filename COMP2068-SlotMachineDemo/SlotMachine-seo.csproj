@@ -59,6 +59,8 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="assets\audio\backsounds.mp3" />
+    <Content Include="assets\audio\button.mp3" />
     <Content Include="assets\images\3seven.png" />
     <Content Include="assets\images\blank.png" />
     <Content Include="assets\images\btnBetMax.png" />
@@ -104,7 +106,6 @@
     <TypeScriptCompile Include="Scripts\objects\Button.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="assets\audio\" />
     <Folder Include="assets\fonts\" />
   </ItemGroup>
   <PropertyGroup>

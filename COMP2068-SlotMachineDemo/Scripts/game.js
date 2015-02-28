@@ -11,14 +11,22 @@ var betOneButton;
 var resetButton;
 var tiles = [];
 var tileContainers = [];
-var credit;
-var bet;
-var winnerPaid;
-var lose;
-var win;
+
+// sound objects
 var sndSpin;
 var sndBgm;
 var sndBtn;
+
+createjs.Sound.addEventListener("fileload", handleFileLoad);
+createjs.Sound.alternateExtensions = ["mp3"];
+createjs.Sound.registerSound([
+    { id: "background", src: "background.mp3" },
+    { id: "button", src: "button.mp3" }], "assets/");
+
+function handleFileLoad(event) {
+    // A sound has been preloaded. This will fire TWICE
+    console.log("Preloaded:", event.id, event.src);
+}
 
 // Game Variables
 var playerMoney = 1000;
@@ -26,12 +34,20 @@ var winnings = 0;
 var jackpot = 5000;
 var turn = 0;
 var playerBet = 5;
-var maxBet = 10;
+var maxBet = 20;
 var winNumber = 0;
 var lossNumber = 0;
 var spinResult;
 var fruits = "";
 var winRatio = 0;
+
+// text objects
+var playerMoneyDisplay = new createjs.Text(playerMoney.toString(), "35px play", "#ff0000 ");
+var credit = new createjs.Text(playerMoney.toString(), "40px Arial", "#FF1100");
+var bet = new createjs.Text(playerBet.toString(), "40px Arial", "#FF1100");
+var winnerPaid = new createjs.Text(winnings.toString(), "40px Arial", "#FF1100");
+var lose = new createjs.Text("Lose: " + lossNumber.toString(), "40px Arial", "#FF1100");
+var win = new createjs.Text("Win: " + winNumber.toString(), "40px Arial", "#FF1100");
 
 /* Tally Variables */
 var grapes = 0;
@@ -52,6 +68,8 @@ function init() {
     createjs.Ticker.addEventListener("tick", gameLoop);
 
     main();
+
+    createjs.Sound.play("background");
 }
 
 function gameLoop() {
@@ -66,7 +84,6 @@ function resetFruitTally() {
     cherries = 0;
     crown = 0;
     seven = 0;
-    seven3 = 0;
     dollor = 0;
     blank = 0;
 }
@@ -82,6 +99,8 @@ function resetAll() {
     winNumber = 0;
     lossNumber = 0;
     winRatio = 0;
+
+    resetText();
 }
 
 // Event handlers
@@ -91,60 +110,96 @@ spinButton.alpha = 1.0;
 function spinButtonOver() {
 spinButton.alpha = 0.5;
 }*/
-function spinReels() {
-    // Add Spin Reels code here
-    spinResult = Reels();
-    fruits = spinResult[0] + " - " + spinResult[1] + " - " + spinResult[2] + " - " + spinResult[3] + " - " + spinResult[4];
-    console.log(fruits);
+function resetText() {
+    // Reset Text
+    //credit = new createjs.Text("credit", "40px Arial", "#FF1100");
+    credit.text = "" + playerMoney;
+    credit.x = 200;
+    credit.y = 536;
 
-    for (var tile = 0; tile < 5; tile++) {
-        //if (turn > 0) {
-        game.removeChild(tiles[tile]);
+    game.addChild(credit);
 
-        //}
-        tiles[tile] = new createjs.Bitmap("assets/images/" + spinResult[tile] + ".png");
-        tiles[tile].x = 110 + (190 * tile);
-        tiles[tile].y = 220;
+    //bet = new createjs.Text("BET", "40px Arial", "#FF1100");
+    bet.text = "" + playerBet;
+    bet.x = 800;
+    bet.y = 536;
 
-        game.addChild(tiles[tile]);
-        console.log(game.getNumChildren());
+    game.addChild(bet);
 
-        determineWinnings();
+    //winnerPaid = new createjs.Text("winnerpaid", "40px Arial", "#FF1100");
+    winnerPaid.text = "" + winnings;
+    winnerPaid.x = 1000;
+    winnerPaid.y = 536;
 
-        // Reset Text
-        //credit = new createjs.Text("credit", "40px Arial", "#FF1100");
-        credit.text = "" + playerMoney;
-        credit.x = 200;
-        credit.y = 536;
+    game.addChild(winnerPaid);
 
-        game.addChild(credit);
+    //win = new createjs.Text("numWin", "40px Arial", "#FF1100");
+    win.text = "Win: " + winNumber;
+    win.x = 360;
+    win.y = 20;
 
-        //bet = new createjs.Text("BET", "40px Arial", "#FF1100");
+    game.addChild(win);
+
+    lose.text = "Lose: " + lossNumber;
+    lose.x = 630;
+    lose.y = 20;
+
+    game.addChild(lose);
+}
+
+function betMax() {
+    if (confirm("Do you want to bet max 20?")) {
+        playerBet = maxBet;
+
         bet.text = "" + playerBet;
         bet.x = 800;
         bet.y = 536;
 
         game.addChild(bet);
+    }
+}
 
-        //winnerPaid = new createjs.Text("winnerpaid", "40px Arial", "#FF1100");
-        winnerPaid.text = "" + winnings;
-        winnerPaid.x = 1000;
-        winnerPaid.y = 536;
+function betOne() {
+    if (confirm("Do you want to bet basic 5?")) {
+        playerBet = 5;
 
-        game.addChild(winnerPaid);
+        bet.text = "" + playerBet;
+        bet.x = 800;
+        bet.y = 536;
 
-        //win = new createjs.Text("numWin", "40px Arial", "#FF1100");
-        win.text = "Win: " + winNumber;
-        win.x = 360;
-        win.y = 20;
+        game.addChild(bet);
+    }
+}
 
-        game.addChild(win);
+function spinReels() {
+    if (+credit.toString() < 0) {
+        if (confirm("You lose your money. Do you want to reset the game? Reset the game is 'OK', Queit the game is 'Cancel'.")) {
+            resetAll();
+        } else {
+        }
+    } else {
+        createjs.Sound.play("button");
 
-        lose.text = "Lose: " + lossNumber;
-        lose.x = 630;
-        lose.y = 20;
+        // Add Spin Reels code here
+        spinResult = Reels();
+        fruits = spinResult[0] + " - " + spinResult[1] + " - " + spinResult[2] + " - " + spinResult[3] + " - " + spinResult[4];
+        console.log(fruits);
 
-        game.addChild(lose);
+        for (var tile = 0; tile < 5; tile++) {
+            //if (turn > 0) {
+            game.removeChild(tiles[tile]);
+
+            //}
+            tiles[tile] = new createjs.Bitmap("assets/images/" + spinResult[tile] + ".png");
+            tiles[tile].x = 110 + (190 * tile);
+            tiles[tile].y = 220;
+
+            game.addChild(tiles[tile]);
+            console.log(game.getNumChildren());
+
+            resetText();
+        }
+        determineWinnings();
     }
 }
 
@@ -167,8 +222,8 @@ function Reels() {
         outCome[spin] = Math.floor((Math.random() * 65) + 1);
         switch (outCome[spin]) {
             case checkRange(outCome[spin], 1, 27):
-                betLine[spin] = "dollor";
-                dollor++;
+                betLine[spin] = "blank";
+                blank++;
                 break;
             case checkRange(outCome[spin], 28, 37):
                 betLine[spin] = "grapes";
@@ -191,15 +246,17 @@ function Reels() {
                 crown++;
                 break;
             case checkRange(outCome[spin], 63, 64):
+                betLine[spin] = "dollor";
+                dollor++;
+                break;
+            case checkRange(outCome[spin], 65, 65):
                 betLine[spin] = "seven";
                 seven++;
                 break;
-            case checkRange(outCome[spin], 65, 65):
-                betLine[spin] = "3seven";
-                seven3++;
-                break;
         }
     }
+
+    //alert(betLine[0] + "  " + betLine[1] + "  " + betLine[2] + "  " + betLine[3] + "  " + betLine[4]);
     return betLine;
 }
 
@@ -216,42 +273,78 @@ function determineWinnings() {
             winnings = playerBet * 40;
         } else if (crown == 5) {
             winnings = playerBet * 50;
-        } else if (seven == 5) {
+        } else if (dollor == 5) {
             winnings = playerBet * 75;
-        } else if (seven3 == 5) {
+        } else if (seven == 5) {
             winnings = playerBet * 100;
         } else if (grapes == 4) {
-            winnings = playerBet * 2;
+            winnings = playerBet * 12;
         } else if (watermalon == 4) {
-            winnings = playerBet * 2;
+            winnings = playerBet * 12;
         } else if (oranges == 4) {
-            winnings = playerBet * 3;
+            winnings = playerBet * 13;
         } else if (cherries == 4) {
-            winnings = playerBet * 4;
+            winnings = playerBet * 14;
         } else if (crown == 4) {
-            winnings = playerBet * 5;
+            winnings = playerBet * 15;
+        } else if (dollor == 4) {
+            winnings = playerBet * 20;
         } else if (seven == 4) {
+            winnings = playerBet * 40;
+        } else if (grapes == 3) {
+            winnings = playerBet * 6;
+        } else if (watermalon == 3) {
+            winnings = playerBet * 6;
+        } else if (oranges == 3) {
+            winnings = playerBet * 7;
+        } else if (cherries == 3) {
+            winnings = playerBet * 8;
+        } else if (crown == 3) {
+            winnings = playerBet * 9;
+        } else if (dollor == 3) {
+            winnings = playerBet * 15;
+        } else if (seven == 3) {
+            winnings = playerBet * 30;
+        } else if (grapes == 2) {
+            winnings = playerBet * 2;
+        } else if (watermalon == 2) {
+            winnings = playerBet * 2;
+        } else if (oranges == 2) {
+            winnings = playerBet * 3;
+        } else if (cherries == 2) {
+            winnings = playerBet * 4;
+        } else if (crown == 2) {
+            winnings = playerBet * 5;
+        } else if (dollor == 2) {
             winnings = playerBet * 10;
-        } else if (seven3 == 4) {
+        } else if (seven == 2) {
             winnings = playerBet * 20;
         } else {
             winnings = playerBet * 1;
         }
 
-        if (seven3 == 3) {
+        if (seven == 1) {
             winnings = playerBet * 5;
         }
         winNumber++;
-        // showWinMessage();
+        playerMoney = playerMoney + winnings;
+        //showWinMessage();
     } else {
         lossNumber++;
-        //  showLossMessage();
+        playerMoney = playerMoney - playerBet;
+        //showLossMessage();
     }
+
+    resetFruitTally();
 }
 
 function createUI() {
+    createjs.Sound.alternateExtensions = ["mp3"];
+    createjs.Sound.registerSound("assets/audio/button.mp3", "bntSound", 1);
+
     // instantiate my background
     background = new createjs.Bitmap("/assets/images/background.png");
+
     game.addChild(background);
 
     // Spin Button
@@ -265,11 +358,13 @@ function createUI() {
     betMaxButton = new objects.Button("/assets/images/btnBetMax.png", 325, 533);
     betMaxButton.setScale(129 / 132, 128 / 131);
     game.addChild(betMaxButton.getImage());
+    betMaxButton.getImage().addEventListener("click", betMax);
 
     // Bet one Button
     betOneButton = new objects.Button("/assets/images/btnBetOne.png", 454, 533);
     betOneButton.setScale(129 / 132, 128 / 131);
     game.addChild(betOneButton.getImage());
+    betOneButton.getImage().addEventListener("click", betOne);
 
     // Reset Button
     resetButton = new objects.Button("/assets/images/btnReset.png", 44, 594);
@@ -282,40 +377,29 @@ function createUI() {
         console.log("reset clicked");
 
         // Reset Text
-        credit = new createjs.Text("credit", "40px Arial", "#FF1100");
-        credit.text = "" + playerMoney;
         credit.x = 200;
         credit.y = 536;
-
         game.addChild(credit);
 
-        bet = new createjs.Text("BET", "40px Arial", "#FF1100");
-        bet.text = "" + playerBet;
         bet.x = 800;
         bet.y = 536;
-
         game.addChild(bet);
 
-        winnerPaid = new createjs.Text("winnerpaid", "40px Arial", "#FF1100");
-        winnerPaid.text = "" + winnings;
         winnerPaid.x = 1000;
         winnerPaid.y = 536;
-
         game.addChild(winnerPaid);
 
-        win = new createjs.Text("numWin", "40px Arial", "#FF1100");
-        win.text = "Win: " + winNumber;
         win.x = 360;
         win.y = 20;
-
         game.addChild(win);
 
-        lose = new createjs.Text("numLose", "40px Arial", "#FF1100");
-        lose.text = "Lose: " + lossNumber;
         lose.x = 630;
         lose.y = 20;
-
         game.addChild(lose);
+
+        resetText();
+
+        this.getStage().enableMouseOver();
     });
 }
 
@@ -326,9 +410,13 @@ function main() {
     game.x = 0;
     game.y = 0;
 
+    createjs.Sound.on("fileload", createjs.proxy(this.loadHandler, (this)));
+    createjs.Sound.registerSound("assets/audio/backsounds.mp3", "winSound", 1);
+
     // Create Slotmachine User Interface
     createUI();
 
     stage.addChild(game);
+    createjs.Sound.play("winSound");
 }
 //# sourceMappingURL=game.js.map
