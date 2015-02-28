@@ -11,6 +11,7 @@ var spinButton: objects.Button;
 var betMaxButton: objects.Button;
 var betOneButton: objects.Button;
 var resetButton: objects.Button;
+var powerButton: objects.Button;
 var tiles: createjs.Bitmap[] = [];
 var tileContainers: createjs.Container[] = [];
 
@@ -102,12 +103,14 @@ function resetAll() {
     jackpot = 5000;
     turn = 0;
     playerBet = 5;
-    maxBet = 10;
+    maxBet = 20;
     winNumber = 0;
     lossNumber = 0;
     winRatio = 0;
 
     resetText();
+
+    setEnableSpin();
 }
 
 
@@ -125,7 +128,6 @@ function spinButtonOver() {
     spinButton.alpha = 0.5;
 
 }*/
-
 
 function resetText() {
     // Reset Text
@@ -174,6 +176,8 @@ function betMax() {
         bet.y = 536;
 
         game.addChild(bet);
+
+        setEnableSpin();
     }
 }
 
@@ -186,19 +190,37 @@ function betOne() {
         bet.y = 536;
 
         game.addChild(bet);
+
+        setEnableSpin();
+    }
+}
+
+function setEnableSpin() {
+
+    if (playerMoney < playerBet) {
+
+        spinButton = new objects.Button("/assets/images/btnSpin_grey.png", 584, 532);
+        spinButton.setScale(129 / 132, 128 / 131);
+        game.addChild(spinButton.getImage());
+
+    }
+    else {
+        spinButton = new objects.Button("/assets/images/btnSpin.png", 584, 532);
+        spinButton.setScale(129 / 132, 128 / 131);
+        game.addChild(spinButton.getImage());
+        spinButton.getImage().addEventListener("click", spinReels);
     }
 }
 
 function spinReels() {
 
-    if (+credit.toString() < 0) {
+    if (playerMoney < playerBet) {
 
-        if (confirm("You lose your money. Do you want to reset the game? Reset the game is 'OK', Queit the game is 'Cancel'.")) {
-            resetAll();
-        }
-        else {
 
-        }
+        alert("You don't have enough money for betting. Please press the reset button.")
+
+        setEnableSpin();
+
     }
     else {
         createjs.Sound.play("button");
@@ -220,10 +242,10 @@ function spinReels() {
 
             game.addChild(tiles[tile]);
             console.log(game.getNumChildren());
-
-            resetText();
         }
+        
         determineWinnings();
+        resetText();
     }
     
 }
@@ -398,7 +420,14 @@ function determineWinnings() {
 }
 
 
+function powerOff() {
+    if (confirm("Do you want to close the window?")) {
+        window.close();
+    }
+}
+
 function createUI(): void {
+    createjs.Sound.play("background");
 
     createjs.Sound.alternateExtensions = ["mp3"];
     createjs.Sound.registerSound("assets/audio/button.mp3", "bntSound", 1);
@@ -429,14 +458,16 @@ function createUI(): void {
     betOneButton.getImage().addEventListener("click", betOne);
 
     // Reset Button
-    resetButton = new objects.Button("/assets/images/btnReset.png", 44, 594);
+    resetButton = new objects.Button("/assets/images/btnReset.png", 46, 594);
     resetButton.setScale(95/132, 95/131);
     game.addChild(resetButton.getImage());
-
     resetButton.getImage().addEventListener("click", resetAll);
 
-    resetButton.getImage().addEventListener("click", function () {
-        console.log("reset clicked");
+    // power Button
+    powerButton = new objects.Button("/assets/images/btnPower.png", 941, 2);
+    powerButton.setScale(81 / 102, 80 / 101);
+    game.addChild(powerButton.getImage());
+    powerButton.getImage().addEventListener("click", powerOff);
 
     // Reset Text
         credit.x = 200;
@@ -465,8 +496,6 @@ function createUI(): void {
 
         resetText();
 
-        this.getStage().enableMouseOver();
-    });
 }
 
 
@@ -478,12 +507,9 @@ function main() {
     game.x = 0;
     game.y = 0;
 
-    createjs.Sound.on("fileload", createjs.proxy(this.loadHandler, (this)));
-    createjs.Sound.registerSound("assets/audio/backsounds.mp3", "winSound", 1);
-    
     // Create Slotmachine User Interface
     createUI();
 
     stage.addChild(game);
-    createjs.Sound.play("winSound");
+    
 }
