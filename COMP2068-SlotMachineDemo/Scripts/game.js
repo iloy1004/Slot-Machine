@@ -13,16 +13,12 @@ var powerButton;
 var tiles = [];
 var tileContainers = [];
 
-// sound objects
-var sndSpin;
-var sndBgm;
-var sndBtn;
-
+// set bgm
 createjs.Sound.addEventListener("fileload", handleFileLoad);
 createjs.Sound.alternateExtensions = ["mp3"];
-createjs.Sound.registerSound([
-    { id: "background", src: "background.mp3" },
-    { id: "button", src: "button.mp3" }], "assets/");
+createjs.Sound.registerSound({ id: "backsound", src: "assets/audio/backsounds.mp3" });
+createjs.Sound.registerSound({ id: "button", src: "assets/audio/button.mp3" });
+createjs.Sound.registerSound({ id: "jackpot", src: "assets/audio/jackpot.mp3" });
 
 function handleFileLoad(event) {
     // A sound has been preloaded. This will fire TWICE
@@ -70,7 +66,7 @@ function init() {
 
     main();
 
-    createjs.Sound.play("background");
+    createjs.Sound.play("backsound");
 }
 
 function gameLoop() {
@@ -114,6 +110,8 @@ function spinButtonOver() {
 spinButton.alpha = 0.5;
 }*/
 function resetText() {
+    createjs.Sound.play("button");
+
     // Reset Text
     //credit = new createjs.Text("credit", "40px Arial", "#FF1100");
     credit.text = "" + playerMoney;
@@ -151,6 +149,7 @@ function resetText() {
 }
 
 function betMax() {
+    createjs.Sound.play("button");
     if (confirm("Do you want to bet max 20?")) {
         playerBet = maxBet;
 
@@ -165,6 +164,7 @@ function betMax() {
 }
 
 function betOne() {
+    createjs.Sound.play("button");
     if (confirm("Do you want to bet basic 5?")) {
         playerBet = 5;
 
@@ -191,12 +191,20 @@ function setEnableSpin() {
     }
 }
 
+function msgJackpot() {
+    createjs.Sound.play("jackpot");
+    alert("You win the Jackpot!! Congraturations!!");
+}
+
 function spinReels() {
     if (playerMoney < playerBet) {
         alert("You don't have enough money for betting. Please press the reset button.");
 
         setEnableSpin();
     } else {
+        createjs.Sound.stop();
+
+        //createjs.Sound.play("backsound");
         createjs.Sound.play("button");
 
         // Add Spin Reels code here
@@ -296,6 +304,7 @@ function determineWinnings() {
             winnings = playerBet * 75;
         } else if (seven == 5) {
             winnings = playerBet * 100;
+            msgJackpot();
         } else if (grapes == 4) {
             winnings = playerBet * 12;
         } else if (watermalon == 4) {
@@ -347,6 +356,7 @@ function determineWinnings() {
         }
         winNumber++;
         playerMoney = playerMoney + winnings;
+        //msgJackpot();
         //showWinMessage();
     } else {
         lossNumber++;
@@ -358,16 +368,29 @@ function determineWinnings() {
 }
 
 function powerOff() {
-    if (confirm("Do you want to close the window?")) {
-        window.close();
+    createjs.Sound.play("button");
+
+    if (confirm("Do you want to off the game?")) {
+        spinButton = new objects.Button("/assets/images/btnSpin_grey.png", 584, 532);
+        spinButton.setScale(129 / 132, 128 / 131);
+        game.addChild(spinButton.getImage());
+
+        playerMoney = 0;
+        winnings = 0;
+        jackpot = 0;
+        turn = 0;
+        playerBet = 0;
+        maxBet = 0;
+        winNumber = 0;
+        lossNumber = 0;
+        winRatio = 0;
+
+        resetText();
     }
 }
 
 function createUI() {
-    createjs.Sound.play("background");
-
-    createjs.Sound.alternateExtensions = ["mp3"];
-    createjs.Sound.registerSound("assets/audio/button.mp3", "bntSound", 1);
+    createjs.Sound.play("backsound");
 
     // instantiate my background
     background = new createjs.Bitmap("/assets/images/background.png");
@@ -440,5 +463,7 @@ function main() {
     createUI();
 
     stage.addChild(game);
+
+    createjs.Sound.play("backsound");
 }
 //# sourceMappingURL=game.js.map

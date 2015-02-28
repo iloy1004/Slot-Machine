@@ -61,6 +61,7 @@
   <ItemGroup>
     <Content Include="assets\audio\backsounds.mp3" />
     <Content Include="assets\audio\button.mp3" />
+    <Content Include="assets\audio\jackpot.mp3" />
     <Content Include="assets\images\3seven.png" />
     <Content Include="assets\images\blank.png" />
     <Content Include="assets\images\btnBetMax.png" />
