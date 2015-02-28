@@ -39,7 +39,7 @@ var winNumber = 0;
 var lossNumber = 0;
 var spinResult;
 var fruits = "";
-var winRatio = 0;
+var winRatio = false;
 
 // text objects
 var playerMoneyDisplay = new createjs.Text(playerMoney.toString(), "35px play", "#ff0000 ");
@@ -101,7 +101,7 @@ function resetAll() {
     maxBet = 20;
     winNumber = 0;
     lossNumber = 0;
-    winRatio = 0;
+    winRatio = false;
 
     resetText();
 
@@ -125,6 +125,7 @@ function spinButtonOver() {
 }*/
 
 function resetText() {
+    createjs.Sound.stop();
     createjs.Sound.play("button");
     // Reset Text
     //credit = new createjs.Text("credit", "40px Arial", "#FF1100");
@@ -164,6 +165,7 @@ function resetText() {
 }
 
 function betMax() {
+    createjs.Sound.stop();
     createjs.Sound.play("button");
     if (confirm("Do you want to bet max 20?")) {
         playerBet = maxBet;
@@ -179,6 +181,7 @@ function betMax() {
 }
 
 function betOne() {
+    createjs.Sound.stop();
     createjs.Sound.play("button");
     if (confirm("Do you want to bet basic 5?")) {
         playerBet = 5;
@@ -212,7 +215,7 @@ function setEnableSpin() {
 
 function msgJackpot() {
     createjs.Sound.play("jackpot");
-    alert("You win the Jackpot!! Congraturations!!");
+    alert("You win the Jackpot!! congratulations!!");
 }
 
 function spinReels() {
@@ -252,6 +255,13 @@ function spinReels() {
         
         determineWinnings();
         resetText();
+
+        //show message to win
+        if (winRatio == true) {
+            createjs.Sound.play("jackpot");
+            alert("congratulations! you win!!");
+        }
+        
     }
     
 }
@@ -413,13 +423,12 @@ function determineWinnings() {
         }
         winNumber++;
         playerMoney = playerMoney + winnings;
-        //msgJackpot();
-        //showWinMessage();
+        winRatio = true;
     }
     else {
         lossNumber++;
         playerMoney = playerMoney - playerBet;
-        
+        winRatio = false;
         //showLossMessage();
     }
 
@@ -446,7 +455,7 @@ function powerOff() {
         maxBet = 0;
         winNumber = 0;
         lossNumber = 0;
-        winRatio = 0;
+        winRatio = false;
 
         resetText();
 
